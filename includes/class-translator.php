@@ -7,8 +7,11 @@ defined( 'ABSPATH' ) || exit;
  */
 class AET_Translator {
 
-    const ENDPOINT = 'https://translate.googleapis.com/translate_a/single';
-    const CACHE_GROUP = 'aet_translations';
+    const ENDPOINT            = 'https://translate.googleapis.com/translate_a/single';
+    const CACHE_GROUP         = 'aet_translations';
+    const MAX_BATCH_ITEMS     = 40;
+    const MAX_TEXT_LENGTH     = 2000;
+    const MAX_TOTAL_CHARS     = 20000;
 
     public function __construct() {
         add_action( 'wp_ajax_nopriv_aet_translate', [ $this, 'ajax_translate' ] );
@@ -32,16 +35,30 @@ class AET_Translator {
             wp_send_json_error( 'Invalid payload', 400 );
         }
 
-        $texts  = array_map( 'sanitize_textarea_field', (array) ( $body['texts']  ?? [] ) );
-        $target = sanitize_key( $body['target'] ?? 'ar' );
-        $source = sanitize_key( $body['source'] ?? 'en' );
+        $raw_texts = (array) ( $body['texts'] ?? [] );
+        $texts     = array_slice( array_map( 'sanitize_textarea_field', $raw_texts ), 0, self::MAX_BATCH_ITEMS );
+        $target    = sanitize_key( $body['target'] ?? 'ar' );
+        $source    = sanitize_key( $body['source'] ?? 'en' );
 
         if ( ! in_array( $target, [ 'ar', 'en' ], true ) || empty( $texts ) ) {
             wp_send_json_error( 'Invalid params', 400 );
         }
 
+        $total_chars  = 0;
         $translations = [];
+
         foreach ( $texts as $text ) {
+            if ( function_exists( 'mb_substr' ) ) {
+                $text = mb_substr( $text, 0, self::MAX_TEXT_LENGTH );
+            } else {
+                $text = substr( $text, 0, self::MAX_TEXT_LENGTH );
+            }
+            $total_chars += strlen( $text );
+
+            if ( $total_chars > self::MAX_TOTAL_CHARS ) {
+                break;
+            }
+
             $translations[] = $this->translate( $text, $source, $target );
         }
 

@@ -26,9 +26,15 @@ class AET_Session_Manager {
         if ( ! in_array( $this->storage_mode, [ 'session', 'both' ], true ) ) {
             return;
         }
-        if ( session_status() === PHP_SESSION_NONE && ! headers_sent() ) {
-            session_start();
+
+        // Avoid repeated start attempts in the same request.
+        static $started = false;
+        if ( $started || session_status() === PHP_SESSION_ACTIVE || headers_sent() ) {
+            return;
         }
+
+        session_start();
+        $started = ( session_status() === PHP_SESSION_ACTIVE );
     }
 
     public function get_language(): string {
@@ -62,7 +68,12 @@ class AET_Session_Manager {
         }
 
         if ( in_array( $this->storage_mode, [ 'session', 'both' ], true ) ) {
-            $_SESSION[ self::SESSION_KEY ] = $lang;
+            if ( session_status() !== PHP_SESSION_ACTIVE ) {
+                $this->maybe_start_session();
+            }
+            if ( session_status() === PHP_SESSION_ACTIVE ) {
+                $_SESSION[ self::SESSION_KEY ] = $lang;
+            }
         }
 
         if ( in_array( $this->storage_mode, [ 'cookie', 'both' ], true ) && ! headers_sent() ) {

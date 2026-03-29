@@ -61,11 +61,13 @@ final class AET_Plugin {
         //  but we call set_language here to ensure cookie is written)
         // We instantiate session manager separately for this early call.
         $storage_mode = get_option( 'aet_storage_mode', 'both' );
-        if ( in_array( $storage_mode, [ 'session', 'both' ], true ) && session_status() === PHP_SESSION_NONE && ! headers_sent() ) {
-            session_start();
-        }
         if ( in_array( $storage_mode, [ 'session', 'both' ], true ) ) {
-            $_SESSION['aet_lang'] = $lang;
+            if ( session_status() === PHP_SESSION_NONE && ! headers_sent() ) {
+                session_start();
+            }
+            if ( session_status() === PHP_SESSION_ACTIVE ) {
+                $_SESSION['aet_lang'] = $lang;
+            }
         }
         if ( in_array( $storage_mode, [ 'cookie', 'both' ], true ) && ! headers_sent() ) {
             setcookie( 'aet_lang', $lang, [

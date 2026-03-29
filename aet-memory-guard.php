@@ -20,26 +20,39 @@ defined( 'ABSPATH' ) || exit;
 if ( isset( $_GET['lang'] ) && in_array( sanitize_key( $_GET['lang'] ), [ 'ar', 'en' ], true ) ) {
     $aet_lang = sanitize_key( $_GET['lang'] );
 
-    // Write to cookie / session so AET main plugin can read it
+    // Persist language with minimal overhead.
     if ( session_status() === PHP_SESSION_NONE && ! headers_sent() ) {
         @session_start();
     }
-    $_SESSION['aet_lang'] = $aet_lang;
+    if ( session_status() === PHP_SESSION_ACTIVE ) {
+        $_SESSION['aet_lang'] = $aet_lang;
+    }
 
     if ( ! headers_sent() ) {
         setcookie( 'aet_lang', $aet_lang, time() + YEAR_IN_SECONDS, COOKIEPATH ?: '/', COOKIE_DOMAIN ?: '', is_ssl(), false );
         $_COOKIE['aet_lang'] = $aet_lang;
     }
 
-    // Remove from all superglobals so WP never sees it
+    // Remove from all superglobals so WP never sees it.
     unset( $_GET['lang'], $_REQUEST['lang'] );
 
     if ( isset( $_SERVER['QUERY_STRING'] ) ) {
-        $_SERVER['QUERY_STRING'] = preg_replace( '/(?:^|&)lang=[^&]*/', '', $_SERVER['QUERY_STRING'] );
-        $_SERVER['QUERY_STRING'] = ltrim( $_SERVER['QUERY_STRING'], '&' );
+        $parts = [];
+        parse_str( (string) $_SERVER['QUERY_STRING'], $parts );
+        unset( $parts['lang'] );
+        $_SERVER['QUERY_STRING'] = http_build_query( $parts );
     }
+
     if ( isset( $_SERVER['REQUEST_URI'] ) ) {
-        $_SERVER['REQUEST_URI'] = preg_replace( '/([?&])lang=[^&]*(&|$)/', '$1', $_SERVER['REQUEST_URI'] );
-        $_SERVER['REQUEST_URI'] = rtrim( $_SERVER['REQUEST_URI'], '?&' );
+        $uri = (string) $_SERVER['REQUEST_URI'];
+        $q   = strpos( $uri, '?' );
+        if ( false !== $q ) {
+            $base = substr( $uri, 0, $q );
+            $qs   = substr( $uri, $q + 1 );
+            parse_str( $qs, $params );
+            unset( $params['lang'] );
+            $new_qs = http_build_query( $params );
+            $_SERVER['REQUEST_URI'] = $base . ( $new_qs ? '?' . $new_qs : '' );
+        }
     }
 }

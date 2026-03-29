@@ -3,7 +3,7 @@
  * Plugin Name:       Arabic ↔ English Translator
  * Plugin URI:        https://example.com/arabic-english-translator
  * Description:       Automatic Arabic ↔ English translation with language switcher, RTL/LTR support, WooCommerce & Woodmart compatibility. Memory-optimised: never loads Arabic translation files.
- * Version:           1.1.0
+ * Version:           1.1.1
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Your Name
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'AET_VERSION', '1.1.0' );
+define( 'AET_VERSION', '1.1.1' );
 define( 'AET_FILE',    __FILE__ );
 define( 'AET_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'AET_URL',     plugin_dir_url( __FILE__ ) );

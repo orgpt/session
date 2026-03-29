@@ -40,6 +40,15 @@ spl_autoload_register( static function ( string $class ): void {
 //   - Woodmart theme setup
 // This guarantees ?lang= is consumed and removed before anything else sees it.
 add_action( 'plugins_loaded', static function (): void {
+    // Emergency memory safety: keep frontend locale English so WP doesn't load
+    // huge non-English translation PHP files on every request.
+    add_filter( 'pre_determine_locale', static function ( $locale ) {
+        if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+            return $locale;
+        }
+        return 'en_US';
+    }, 0 );
+
     AET_Plugin::get_instance();
 }, 1 );
 

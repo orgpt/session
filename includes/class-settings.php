@@ -17,6 +17,8 @@ class AET_Settings {
     }
 
     public function register_settings(): void {
+        add_action( 'admin_post_aet_apply_wplang_fix', [ $this, 'apply_wplang_fix' ] );
+
         $fields = [
             'aet_default_language'  => 'sanitize_key',
             'aet_show_floating'     => 'absint',
@@ -149,8 +151,6 @@ class AET_Settings {
 
         </div>
         <?php
-        // Handle fix application
-        add_action( 'admin_post_aet_apply_wplang_fix', [ $this, 'apply_wplang_fix' ] );
     }
 
     public function apply_wplang_fix(): void {

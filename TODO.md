@@ -6,4 +6,5 @@
 - [x] Add AJAX batch/memory guards in `includes/class-translator.php`.
 - [x] Update version metadata in `arabic-english-translator.php`.
 - [ ] Run PHP lint on edited files.
+- [ ] Verify runtime memory issue is resolved in WordPress after deployment.
 - [ ] Mark all tasks complete.

@@ -15,6 +15,14 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Emergency locale safety for frontend requests.
+// Forces English locale early to avoid loading huge translation files.
+if ( ! is_admin() ) {
+    add_filter( 'pre_determine_locale', static function ( $locale ) {
+        return 'en_US';
+    }, 0 );
+}
+
 // ── Strip ?lang= immediately ─────────────────────────────────────────────────
 // Must run before init where WP loads translations.
 if ( isset( $_GET['lang'] ) && in_array( sanitize_key( $_GET['lang'] ), [ 'ar', 'en' ], true ) ) {

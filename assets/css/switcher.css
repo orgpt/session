@@ -1,0 +1,133 @@
+/* =========================================================
+   AET – Arabic ↔ English Translator  |  switcher.css
+   ========================================================= */
+
+/* ── Custom properties ──────────────────────────────────── */
+:root {
+  --aet-primary:      #1a6b3a;
+  --aet-primary-dark: #124d2a;
+  --aet-accent:       #f5c518;
+  --aet-surface:      #ffffff;
+  --aet-text:         #1c1c1e;
+  --aet-text-muted:   #6e6e73;
+  --aet-radius:       30px;
+  --aet-shadow:       0 4px 20px rgba(0,0,0,.18);
+  --aet-transition:   .2s ease;
+}
+
+/* ── Shared switcher layout ─────────────────────────────── */
+.aet-switcher {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             4px;
+  background:      var(--aet-surface);
+  border:          1.5px solid rgba(0,0,0,.1);
+  border-radius:   var(--aet-radius);
+  padding:         4px 6px;
+  box-shadow:      var(--aet-shadow);
+  font-family:     inherit;
+  line-height:     1;
+}
+
+/* ── Buttons ────────────────────────────────────────────── */
+.aet-btn {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             5px;
+  padding:         6px 14px;
+  border:          none;
+  border-radius:   var(--aet-radius);
+  background:      transparent;
+  color:           var(--aet-text-muted);
+  font-size:       .875rem;
+  font-weight:     500;
+  cursor:          pointer;
+  transition:      background var(--aet-transition),
+                   color var(--aet-transition),
+                   transform var(--aet-transition);
+  white-space:     nowrap;
+}
+
+.aet-btn:hover {
+  background: rgba(26, 107, 58, .08);
+  color:      var(--aet-primary);
+  transform:  translateY(-1px);
+}
+
+.aet-btn--active {
+  background: var(--aet-primary);
+  color:      #fff;
+}
+
+.aet-btn--active:hover {
+  background: var(--aet-primary-dark);
+  color:      #fff;
+  transform:  translateY(-1px);
+}
+
+.aet-btn:focus-visible {
+  outline: 2px solid var(--aet-accent);
+  outline-offset: 2px;
+}
+
+/* ── Flag emoji ─────────────────────────────────────────── */
+.aet-flag {
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+.aet-divider {
+  color:       var(--aet-text-muted);
+  font-size:   .75rem;
+  user-select: none;
+}
+
+/* ── Floating variant ────────────────────────────────────── */
+.aet-switcher--floating {
+  position:   fixed;
+  bottom:     24px;
+  inset-inline-end: 24px;   /* RTL-aware */
+  z-index:    9999;
+  box-shadow: 0 6px 30px rgba(0,0,0,.22);
+  border:     none;
+  animation:  aet-pop-in .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+@keyframes aet-pop-in {
+  from { opacity: 0; transform: scale(.7) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)  translateY(0); }
+}
+
+/* ── Inline variant (shortcode) ─────────────────────────── */
+.aet-switcher--inline {
+  margin: 0 auto;
+}
+
+/* ── Loading skeleton on init ───────────────────────────── */
+.aet-translating {
+  opacity: .55;
+  pointer-events: none;
+}
+
+/* ── Smooth direction transition ─────────────────────────── */
+html {
+  transition: direction var(--aet-transition);
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .aet-switcher--floating {
+    bottom: 14px;
+    inset-inline-end: 14px;
+  }
+
+  .aet-btn {
+    padding: 6px 10px;
+    font-size: .8rem;
+  }
+
+  .aet-label {
+    display: none;        /* Show only flags on tiny screens */
+  }
+}
